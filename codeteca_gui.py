@@ -3,11 +3,10 @@ from tkinter import ttk, messagebox
 import mysql.connector
 from datetime import datetime, date, timedelta
 
-# ================== CONFIGURAÇÃO DO BANCO ==================
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "Ilcs050607",  # altere aqui se necessário
+    "password": "Ilcs050607",  
     "database": "CodeTeca"
 }
 
@@ -21,14 +20,12 @@ def para_br(data):
     # se já for date/datetime
     if isinstance(data, (date, datetime)):
         return data.strftime("%d/%m/%Y")
-    # tenta tratar string no formato YYYY-MM-DD
     s = str(data).strip()
     try:
         if len(s) == 10 and s[4] == '-' and s[7] == '-':
             return datetime.strptime(s, "%Y-%m-%d").strftime("%d/%m/%Y")
     except Exception:
         pass
-    # fallback: devolve string original
     return s
 
 def formatar_linhas(dados):
@@ -40,13 +37,10 @@ def formatar_linhas(dados):
     for linha in dados:
         nova = []
         for valor in linha:
-            # tenta formatar todo valor que seja date/datetime ou string YYYY-MM-DD
             nova.append(para_br(valor) if (isinstance(valor, (date, datetime)) or (isinstance(valor, str) and "-" in valor and len(valor) == 10)) else valor)
         linhas.append(nova)
     return linhas
 
-
-# ================== FUNÇÕES DE LISTAGEM (já existentes) ==================
 def listar_usuarios():
     con = None
     try:
@@ -59,17 +53,16 @@ def listar_usuarios():
         """)
         dados = cur.fetchall()
 
-        # Formatação simples com a função auxiliar
         dados_formatados = [
             [
-                linha[0],              # ID
-                linha[1],              # Nome
-                linha[2],              # Email
-                para_br(linha[3]),     # DtNasc formatada
-                linha[4],              # Logradouro
-                linha[5],              # Numero
-                linha[6],              # Complemento
-                linha[7]               # CEP
+                linha[0],             
+                linha[1],           
+                linha[2],             
+                para_br(linha[3]),    
+                linha[4],             
+                linha[5],             
+                linha[6],             
+                linha[7]               
             ]
             for linha in dados
         ]
@@ -92,8 +85,6 @@ def listar_livros():
     try:
         con = conectar()
         cur = con.cursor()
-
-        # Query que busca livros com os autores concatenados
         cur.execute("""
             SELECT 
                 L.ID_livro,
@@ -110,7 +101,6 @@ def listar_livros():
 
         dados_formatados = formatar_linhas(dados)
 
-        # Colunas agora incluem "Autores"
         atualizar_tabela(["ID", "Título", "Ano", "Autores"], dados_formatados)
 
     except Exception as e:
@@ -187,7 +177,6 @@ def listar_emprestimos():
         if con:
             con.close()
 
-# ================== FUNÇÕES CRUD USUÁRIO ==================
 
 def abrir_janela_editar_usuario():
     selecionado = tabela.focus()
@@ -206,25 +195,21 @@ def abrir_janela_editar_usuario():
     win.geometry("600x350")
     win.configure(bg="#000")
 
-    # NOME
     tk.Label(win, text="Nome:", bg="#000").grid(row=0, column=0, padx=10, pady=8, sticky="w")
     nome_e = tk.Entry(win, width=40)
     nome_e.insert(0, nome)
     nome_e.grid(row=0, column=1, padx=10, pady=8)
 
-    # EMAIL
     tk.Label(win, text="E-mail:", bg="#000").grid(row=1, column=0, padx=10, pady=8, sticky="w")
     email_e = tk.Entry(win, width=40)
     email_e.insert(0, email)
     email_e.grid(row=1, column=1, padx=10, pady=8)
 
-    # DATA NASC
     tk.Label(win, text="Data Nascimento:", bg="#000").grid(row=2, column=0, padx=10, pady=8, sticky="w")
     dtnasc_e = tk.Entry(win, width=20)
     dtnasc_e.insert(0, dtnasc)
     dtnasc_e.grid(row=2, column=1, padx=10, pady=8, sticky="w")
 
-    # LOGRADOURO
     tk.Label(win, text="Logradouro:", bg="#000").grid(row=3, column=0, padx=10, pady=8, sticky="w")
     logradouro_e = tk.Entry(win, width=40)
     logradouro_e.insert(0, logradouro)
@@ -312,7 +297,6 @@ def excluir_usuario():
         if con:
             con.close()
 
-# ================== FUNÇÕES AUXILIARES ==================
 def atualizar_tabela(colunas, dados):
     tabela.delete(*tabela.get_children())
     tabela["columns"] = colunas
@@ -323,7 +307,6 @@ def atualizar_tabela(colunas, dados):
     for linha in dados:
         tabela.insert("", "end", values=linha)
 
-# ================== JANELA: CADASTRAR USUÁRIO ==================
 def abrir_janela_cadastrar_usuario():
     win = tk.Toplevel(janela)
     win.title("Cadastrar Usuário")
@@ -346,13 +329,12 @@ def abrir_janela_cadastrar_usuario():
             parent,
             width=25,
             font=("Segoe UI", 10),
-            bg="#000",          # fundo escuro
-            fg="#888",             # texto inicial cinza (placeholder)
-            insertbackground="white"  # cursor branco
+            bg="#000",       
+            fg="#888",             
+            insertbackground="white"  
         )
         entrada.grid(row=linha+1, column=coluna, padx=5, pady=5)
 
-        # ----- Placeholder -----
         entrada.insert(0, placeholder)
 
         def focar_in(event):
@@ -422,7 +404,6 @@ def abrir_janela_cadastrar_usuario():
                            width=18, command=salvar_usuario)
     btn_salvar.grid(row=5, column=1, pady=12)
 
-# ================== JANELA: GERAR MULTA ==================
 def abrir_janela_gerar_multa():
     win = tk.Toplevel(janela)
     win.title("Gerar Multa")
@@ -451,7 +432,6 @@ def abrir_janela_gerar_multa():
     validade_e.grid(row=5, column=0, sticky="e", padx=(0,6), pady=6)
     validade_e.insert(0, (datetime.today() + timedelta(days=30)).strftime("%Y-%m-%d"))
 
-    # preencher combobox com empréstimos existentes (id, usuario, status)
     con = None
     try:
         con = conectar()
@@ -514,7 +494,6 @@ def abrir_janela_gerar_multa():
     ttk.Button(frm, text="Criar Multa",
         width=20, command=salvar_multa).grid(row=6, column=0, pady=12)
 
-# ================== JANELA: FAZER EMPRÉSTIMO ==================
 def abrir_janela_fazer_emprestimo():
     win = tk.Toplevel(janela)
     win.title("Fazer Empréstimo")
@@ -543,7 +522,6 @@ def abrir_janela_fazer_emprestimo():
     dt_prev_e.grid(row=5, column=0, padx=6, pady=6, sticky="e")
     dt_prev_e.insert(0, (datetime.today() + timedelta(days=14)).strftime("%Y-%m-%d"))
 
-    # carregar usuários e cópias disponíveis
     con = None
     try:
         con = conectar()
@@ -552,7 +530,6 @@ def abrir_janela_fazer_emprestimo():
         usuarios = cur.fetchall()
         cb_usuario["values"] = [f"{u[0]} - {u[1]}" for u in usuarios]
 
-        # cópias disponíveis (Disponibilidade = 'Disponível')
         cur.execute("""
             SELECT C.ID_copia, L.Titulo
             FROM Copia C
@@ -597,13 +574,12 @@ def abrir_janela_fazer_emprestimo():
                 (DtEmprestimo, DtDevolucao, DtDevolucaoPrevista, Status, fk_Usuario_ID_usuario, fk_Copia_ID_copia)
                 VALUES (%s, NULL, %s, %s, %s, %s)
             """, (dt_emp, dt_prev, status, id_usuario, id_copia))
-
-            # marcar copia como Indisponível
+            
             cur.execute("UPDATE Copia SET Disponibilidade = %s WHERE ID_copia = %s", ("Indisponível", id_copia))
             con.commit()
             messagebox.showinfo("Sucesso", f"Empréstimo criado (ID {novo_id}) para usuário {id_usuario} e cópia {id_copia}.")
             win.destroy()
-            listar_usuarios()  # opcional: atualizar listagens
+            listar_usuarios()  
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao criar empréstimo:\n{e}")
         finally:
@@ -613,7 +589,6 @@ def abrir_janela_fazer_emprestimo():
     ttk.Button(frm, text="Criar Empréstimo",
               width=20, command=salvar_emprestimo).grid(row=6, column=0, pady=12)
 
-# ================== INTERFACE PRINCIPAL ==================
 janela = tk.Tk()
 janela.title("📚 CodeTeca - Sistema da Biblioteca")
 janela.geometry("1100x720")
@@ -631,20 +606,18 @@ titulo.pack(fill="x")
 frame_botoes = tk.Frame(janela, bg="#000")
 frame_botoes.pack(pady=12)
 
-# botões principais (abrir janelas)
 ttk.Button(frame_botoes, text="💸 Gerar Multa",
           width=18, command=abrir_janela_gerar_multa).grid(row=1, column=0, padx=8)
 ttk.Button(frame_botoes, text="🤝 Fazer Empréstimo",
           width=18, command=abrir_janela_fazer_emprestimo).grid(row=1, column=1, padx=8)
 
-# botões de listagem existentes
 ttk.Button(frame_botoes, text="📝 Cadastrar Usuário", 
            width=18, command=abrir_janela_cadastrar_usuario).grid(row=2, column=0, pady=6, padx=8)
 ttk.Button(frame_botoes, text="✏️ Editar Usuário", 
            width=18, command=abrir_janela_editar_usuario).grid(row=2, column=1, pady=6, padx=8)
 ttk.Button(frame_botoes, text="🗑️ Excluir Usuário", 
            width=18, command=excluir_usuario).grid(row=2, column=2, pady=6, padx=8)
-# === BOTÕES PRINCIPAIS (SUBSTITUIR TUDO O QUE VOCÊ TINHA) ===
+
 frame_botoes.pack(pady=10)
 
 ttk.Button(frame_botoes, text="👤 Listar Usuários",
@@ -660,7 +633,7 @@ ttk.Button(frame_botoes, text="🎒 Listar Empréstimos",
            width=18, command=listar_emprestimos).grid(row=0, column=3, padx=8, pady=5)
 
 
-# tabela de resultados (mantida)
+
 frame_tabela = tk.Frame(janela, bg="#000")
 frame_tabela.pack(fill="both", expand=True, padx=16, pady=6)
 
@@ -675,7 +648,6 @@ rodape = tk.Label(janela, text="CodeTeca", bg="#003366", fg="white",
                   font=("Segoe UI", 10, "italic"), pady=6)
 rodape.pack(fill="x", side="bottom")
 
-# inicializa com listagem de usuários para mostrar algo
 listar_usuarios()
 
 janela.mainloop()
