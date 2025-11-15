@@ -14,7 +14,6 @@ def conectar():
     return mysql.connector.connect(**DB_CONFIG)
 
 def para_br(data):
-    """Recebe date/datetime/str(None) e retorna '' ou 'DD/MM/AAAA'."""
     if not data:
         return ""
     # se já for date/datetime
