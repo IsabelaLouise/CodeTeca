@@ -27,10 +27,6 @@ def para_br(data):
     return s
 
 def formatar_linhas(dados):
-    """
-    Recebe lista de tuplas (linhas do cursor) e retorna lista de listas
-    com datas convertidas para DD/MM/AAAA quando possível.
-    """
     linhas = []
     for linha in dados:
         nova = []
