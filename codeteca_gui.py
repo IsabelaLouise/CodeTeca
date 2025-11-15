@@ -16,7 +16,6 @@ def conectar():
 def para_br(data):
     if not data:
         return ""
-    # se já for date/datetime
     if isinstance(data, (date, datetime)):
         return data.strftime("%d/%m/%Y")
     s = str(data).strip()
