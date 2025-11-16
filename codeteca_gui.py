@@ -612,8 +612,6 @@ ttk.Button(frame_botoes, text="✏️ Editar Usuário",
 ttk.Button(frame_botoes, text="🗑️ Excluir Usuário", 
            width=18, command=excluir_usuario).grid(row=2, column=2, pady=6, padx=8)
 
-frame_botoes.pack(pady=10)
-
 ttk.Button(frame_botoes, text="👤 Listar Usuários",
            width=18, command=listar_usuarios).grid(row=0, column=0, padx=8, pady=5)
 
